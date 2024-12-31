@@ -14,6 +14,7 @@ public class Delay {
     while (c != 'c' && c != 'C') {
       System.out.print("That means the 'c' key on the keyboard and <Enter> ");
       c = bob.next().charAt(0);
-    } 
+    }
+    bob.close();
   }
 }

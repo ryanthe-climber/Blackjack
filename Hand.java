@@ -5,11 +5,13 @@ public class Hand {
     private ArrayList<Card> cards;
     private int handVal;
     private int handAces;
+    private boolean busted;
 
     public Hand() {
         this.cards = new ArrayList<Card>();
         this.handVal = 0;
         this.handAces = 0;
+        this.busted = false;
       }
 
     public void dealToHand(Card card) {
@@ -27,7 +29,16 @@ public class Hand {
             this.handAces -= 1;
         }
 
+        if(this.val() > 21) {
+            System.out.println("Bust! You lose!\n"); //LOSE
+            this.busted = true;
+        }
+        
         return;
+    }
+
+    public boolean hasBusted() {
+        return this.busted;
     }
 
     public int val() {
@@ -41,7 +52,7 @@ public class Hand {
     public void displayHand(int who) {
         String prefix1 = "";
         String prefix2 = "";
-        
+
         if(who == 1) {
             prefix1 = "You have";
             prefix2 = "Your";

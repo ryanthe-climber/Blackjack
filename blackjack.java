@@ -5,6 +5,7 @@
 *plays black jack
 */
 
+import java.util.ArrayList;
 import java.util.Scanner;
 
 public class blackjack {
@@ -33,7 +34,7 @@ public class blackjack {
          int choice = bob.nextInt();
          switch(choice) {
             case 1: valid = true;
-                  int result = play();
+                  int result = playBlackjack();
 
                   switch(result) {
                      case 1: 
@@ -87,7 +88,7 @@ public class blackjack {
                   Delay.prompt();
    }
    
-   public static int play() {
+   public static int playBlackjack() {
 
       /*RETURN VALS
       *1 - player wins (2:1) (noraml win)
@@ -96,8 +97,7 @@ public class blackjack {
       *4 - player ties with dealer (push)
       */
 
-      Scanner joe = new Scanner(System.in);
-
+      
       System.out.println("\n");
 
       Deck deck = new Deck();
@@ -107,6 +107,8 @@ public class blackjack {
 
       Hand dealerHand = new Hand();
       Hand playerHand = new Hand();
+      ArrayList<Hand> hands = new ArrayList<Hand>();
+      hands.add(playerHand);
 
       Card d1 = deck.dealOne();
       dealerHand.dealToHand(d1);
@@ -121,60 +123,31 @@ public class blackjack {
       System.out.println("The dealer has a(n) " + d1);
       playerHand.displayHand(1);
 
-      boolean cont = true;
-
-
+      boolean doHand = true;
 
       if(dealerHand.val() == 21 && playerHand.val() == 21){
          System.out.println("Both you and the dealer have Blackjack! Push!"); //PUSH
-         cont = false;
+         doHand = false;
          return(4);
       } else if(dealerHand.val() == 21) {
          System.out.println("The dealer has Blackjack! You lose!"); //LOSE
          System.out.println("The dealer had a(n) " + d1 + " and a(n) " + d2);
-         cont = false;
+         doHand = false;
          return(3);
       } else if(playerHand.val() == 21) {
          System.out.println("You have Blackjack! You win!!"); //WIN
-         cont = false;
+         doHand = false;
          return(2);
       }
       
       //PLAYER TURN
-      while(cont){
-
-         System.out.print("\nWould you like to (h)it or (s)tand?: ");
-         char answer = joe.next().charAt(0);
-         
-         switch(answer) {
-            case 'h' :
-               cont = true;
-               playerHand.dealToHand(deck.dealOne());
-               playerHand.displayHand(1);
-               break;
-            case 's': 
-               cont = false;
-               System.out.println("\n");
-               break;
-            default: 
-               cont = true;
-               System.out.println("Invalid choice. Please try again: \n");
-         }
-
-         
-      
-         if(playerHand.val() == 21) {
-            System.out.println("You have 21! Dealer's turn!\n");
-            cont = false;
-         } else if(playerHand.val() > 21) {
-            System.out.println("Bust! You lose!\n"); //LOSE
-            cont = false;
+      for(int i = 0; i < hands.size(); i++) {
+         playHand(hands, i, deck);
+         if(hands.get(i).hasBusted()) {
             return(3);
          }
-
       }
-
- 
+      
       //DEALER TURN
       if(playerHand.val() <= 21 && dealerHand.val() < 21) {
          System.out.println("The dealer has a(n) " + d1 + " and a(n) " + d2);
@@ -228,6 +201,47 @@ public class blackjack {
 
       return 0;
    
+   }
+
+   public static void playHand(ArrayList<Hand> hands, int i, Deck deck) {
+      Scanner joe = new Scanner(System.in);
+
+      boolean cont = true;
+
+      Hand currentHand = hands.get(i);
+
+      while(cont){
+
+         System.out.print("\nWould you like to (h)it or (s)tand?: ");
+         char answer = joe.next().charAt(0);
+         
+         switch(answer) {
+            case 'h' :
+               cont = true;
+               currentHand.dealToHand(deck.dealOne());
+               currentHand.displayHand(1);
+               break;
+            case 's': 
+               cont = false;
+               System.out.println("\n");
+               break;
+            default: 
+               cont = true;
+               System.out.println("Invalid choice. Please try again: \n");
+         }
+
+         if(currentHand.val() == 21) {
+            System.out.println("You have 21! Dealer's turn!\n");
+            cont = false;
+         } else if(currentHand.hasBusted()) {
+            System.out.println("Bust! You lose!\n"); //LOSE
+            cont = false;
+            break;
+         }
+
+      }
+
+      return;
    }
 
 }
