@@ -6,7 +6,6 @@
 */
 
 import java.util.Scanner;
-import java.util.ArrayList;
 
 public class blackjack {
 
@@ -105,79 +104,37 @@ public class blackjack {
       deck.shuffle();
       
       //INITIAL 2-CARD DEAL
-      ArrayList<Card> dealerHand = new ArrayList<Card>();
-      ArrayList<Card> playerHand = new ArrayList<Card>();
 
-      int dealerVal = 0; 
-      int playerVal = 0;
-      int dealerAce = 0;
-      int playerAce = 0;
+      Hand dealerHand = new Hand();
+      Hand playerHand = new Hand();
 
       Card d1 = deck.dealOne();
-      dealerHand.add(d1);
-      if(d1.BJvalue() == 1) {
-         dealerVal += 11;
-         dealerAce += 1;
-      } else {
-         dealerVal += d1.BJvalue();
-      }
+      dealerHand.dealToHand(d1);
 
       Card d2 = deck.dealOne();
-      dealerHand.add(d2);
-      if(d2.BJvalue() == 1) {
-         dealerVal += 11;
-         dealerAce += 1;
-      } else {
-         dealerVal += d2.BJvalue();
-      }
+      dealerHand.dealToHand(d2);
+   
+      playerHand.dealToHand(deck.dealOne());
 
-      while(dealerVal > 21 && dealerAce > 0) {
-         dealerVal -= 10;
-         dealerAce -= 1;
-      }
-      
-      Card p1 = deck.dealOne();
-      playerHand.add(p1);
-      if(p1.BJvalue() == 1) {
-         playerVal += 11;
-         playerAce += 1;
-      } else {
-         playerVal += p1.BJvalue();
-      }
-
-      Card p2 = deck.dealOne();
-      playerHand.add(p2);
-      if(p2.BJvalue() == 1) {
-         playerVal += 11;
-         playerAce += 1;
-      } else {
-         playerVal += p2.BJvalue();
-      }
-
-      while(playerVal > 21 && playerAce > 0) {
-         playerVal -= 10;
-         playerAce -= 1;
-      }
+      playerHand.dealToHand(deck.dealOne());
 
       System.out.println("The dealer has a(n) " + d1);
-      System.out.println("You have a(n) " + p1 + " and a(n) " + p2);
+      playerHand.displayHand(1);
 
       boolean cont = true;
 
-//MAKE SURE TO CHECK IF BOTH THE DEALER AND THE PLAYER HAVE BLACKJACK, IN WHICH CASE IT PUSHES
 
-      System.out.println("Your hand total is " + playerVal);
 
-      if(dealerVal == 21 && playerVal == 21){
+      if(dealerHand.val() == 21 && playerHand.val() == 21){
          System.out.println("Both you and the dealer have Blackjack! Push!"); //PUSH
          cont = false;
          return(4);
-      } else if(dealerVal == 21) {
+      } else if(dealerHand.val() == 21) {
          System.out.println("The dealer has Blackjack! You lose!"); //LOSE
          System.out.println("The dealer had a(n) " + d1 + " and a(n) " + d2);
          cont = false;
          return(3);
-      } else if(playerVal == 21) {
+      } else if(playerHand.val() == 21) {
          System.out.println("You have Blackjack! You win!!"); //WIN
          cont = false;
          return(2);
@@ -192,43 +149,24 @@ public class blackjack {
          switch(answer) {
             case 'h' :
                cont = true;
-
-               Card pNew = deck.dealOne();
-               playerHand.add(pNew);
-               if(pNew.BJvalue() == 1) {
-                  playerVal += 11;
-                  playerAce += 1;
-               } else {
-                  playerVal += pNew.BJvalue();
-               }
-         
-               while(playerVal > 21 && playerAce > 0) {
-                  playerVal -= 10;
-                  playerAce -= 1;
-               }
-
-               for(int i = 0; i < playerHand.size(); i++) {
-                  if(i == 0)
-                     System.out.print("You have a(n) " + playerHand.get(i));
-                  else
-                     System.out.print(" and a(n) " + playerHand.get(i));
-               }
-                     
-               System.out.println("\nYour hand total is " + playerVal);
+               playerHand.dealToHand(deck.dealOne());
+               playerHand.displayHand(1);
                break;
-            case 's': cont = false;
-                     System.out.println("\n");
-                     break;
-            default: cont = true;
-                     System.out.println("Invalid choice. Please try again: \n");
+            case 's': 
+               cont = false;
+               System.out.println("\n");
+               break;
+            default: 
+               cont = true;
+               System.out.println("Invalid choice. Please try again: \n");
          }
 
          
       
-         if(playerVal == 21) {
+         if(playerHand.val() == 21) {
             System.out.println("You have 21! Dealer's turn!\n");
             cont = false;
-         } else if(playerVal > 21) {
+         } else if(playerHand.val() > 21) {
             System.out.println("Bust! You lose!\n"); //LOSE
             cont = false;
             return(3);
@@ -238,9 +176,9 @@ public class blackjack {
 
  
       //DEALER TURN
-      if(playerVal <= 21 && dealerVal < 21) {
+      if(playerHand.val() <= 21 && dealerHand.val() < 21) {
          System.out.println("The dealer has a(n) " + d1 + " and a(n) " + d2);
-         System.out.println("\nThe dealer's hand total is " + dealerVal);
+         System.out.println("\nThe dealer's hand total is " + dealerHand.val());
          System.out.print("\n");
 
          Delay.prompt();
@@ -248,47 +186,26 @@ public class blackjack {
          boolean dealCont = true;
 
          while(dealCont){
-            int softDealVal = dealerVal - (10 * dealerAce);
+            int softDealVal = dealerHand.val() - (10 * dealerHand.numAces());
 
             if(softDealVal < 17) { //DEALER HIT
                System.out.println("The dealer hits!\n");
 
-               Card dNew = deck.dealOne();
-               dealerHand.add(dNew);
-               if(dNew.BJvalue() == 1) {
-                  dealerVal += 11;
-                  dealerAce += 1;
-               } else {
-                  dealerVal += dNew.BJvalue();
-               }
-         
-               while(dealerVal > 21 && dealerAce > 0) {
-                  dealerVal -= 10;
-                  dealerAce -= 1;
-               }
+               dealerHand.dealToHand(deck.dealOne());
 
-               for(int i = 0; i < dealerHand.size(); i++) {
-                  if(i == 0)
-                     System.out.print("The dealer has a(n) " + dealerHand.get(i));
-                  else
-                     System.out.print(" and a(n) " + dealerHand.get(i));
-                  }
-               
-               System.out.println("\nThe dealer's hand total is " + dealerVal);
-               System.out.print("\n");
+               dealerHand.displayHand(2);
 
                dealCont = true;
 
                Delay.prompt();
 
-            } else if(dealerVal > 21) { //DEALER BUST
+            } else if(dealerHand.val() > 21) { //DEALER BUST
                System.out.println("The dealer busted! You win!"); //WIN
                dealCont = false;
                return(1);
                
             } else { // DEALER STAND
                System.out.println("The dealer stands!\n");
-
                dealCont = false;
             }
    
@@ -296,11 +213,11 @@ public class blackjack {
 
       }
 
-      if(playerVal <= 21 && dealerVal <= 21) {
-         if(playerVal == dealerVal) {
+      if(playerHand.val() <= 21 && dealerHand.val() <= 21) {
+         if(playerHand.val() == dealerHand.val()) {
             System.out.println("You tied with the dealer!");
             return(4);
-         } else if(playerVal > dealerVal) {
+         } else if(playerHand.val() > dealerHand.val()) {
             System.out.println("You win!");
             return(1);
          } else {
@@ -312,6 +229,5 @@ public class blackjack {
       return 0;
    
    }
-
 
 }
