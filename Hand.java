@@ -2,16 +2,26 @@ import java.util.ArrayList;
 
 public class Hand {
 
+    enum Outcome {
+        NOT_RESOLVED,
+        NORMAL_WIN,
+        BLACKJACK_WIN,
+        LOST,
+        PUSH
+    }
+
     private ArrayList<Card> cards;
     private int handVal;
     private int handAces;
     private boolean busted;
+    private Outcome outcome;
 
     public Hand() {
         this.cards = new ArrayList<Card>();
         this.handVal = 0;
         this.handAces = 0;
         this.busted = false;
+        this.outcome = Outcome.NOT_RESOLVED;
       }
 
     public void dealToHand(Card card) {
@@ -30,10 +40,9 @@ public class Hand {
         }
 
         if(this.val() > 21) {
-            System.out.println("Bust! You lose!\n"); //LOSE
             this.busted = true;
         }
-        
+
         return;
     }
 
@@ -71,4 +80,42 @@ public class Hand {
         System.out.println("\n" + prefix2 + " hand total is " + this.handVal);
     }
 
+    public Card split() {
+        
+        Card secondCard = this.cards.get(1);
+        this.cards.remove(1);
+
+        if(secondCard.BJvalue() == 1) {
+            this.handVal = 11;
+            this.handAces = 1;
+        } else {
+            this.handVal -= secondCard.BJvalue();
+        }
+        
+        return secondCard;
+    }
+
+    public boolean canBeSplit() {
+        if (this.cards.size() == 2 && this.cards.get(0).BJvalue() == this.cards.get(1).BJvalue()) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    public Outcome outcome() {
+        return outcome;
+    }
+
+    public void setOutcome(Outcome outcome) {
+        if(this.outcome == Outcome.NOT_RESOLVED) {
+            this.outcome = outcome;
+        } else if(this.outcome == Outcome.BLACKJACK_WIN && outcome == Outcome.NORMAL_WIN){ 
+            //OKAY
+        } else {
+            System.out.println("\nBRUH YOU TRIED TO SET THE OUTCOME FOR THE SAME HAND TWICE\n");
+        }
+        
+        
+    }
 }
