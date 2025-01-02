@@ -4,7 +4,7 @@ public class display {
 
     }
 
-    public static void cardBack (Card card) {
+    public static void cardBack () {
 
     }
 

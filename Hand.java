@@ -15,13 +15,15 @@ public class Hand {
     private int handAces;
     private boolean busted;
     private Outcome outcome;
+    private int bet;
 
-    public Hand() {
+    public Hand(int bet) {
         this.cards = new ArrayList<Card>();
         this.handVal = 0;
         this.handAces = 0;
         this.busted = false;
         this.outcome = Outcome.NOT_RESOLVED;
+        this.bet = bet;
       }
 
     public void dealToHand(Card card) {
@@ -96,7 +98,7 @@ public class Hand {
     }
 
     public boolean canBeSplit() {
-        if (this.cards.size() == 2 && this.cards.get(0).BJvalue() == this.cards.get(1).BJvalue()) {
+        if (this.cards.size() == 2 && this.cards.get(0).value() == this.cards.get(1).BJvalue()) {
             return true;
         } else {
             return false;
@@ -115,7 +117,13 @@ public class Hand {
         } else {
             System.out.println("\nBRUH YOU TRIED TO SET THE OUTCOME FOR THE SAME HAND TWICE\n");
         }
-        
-        
+    }
+
+    public int bet() {
+        return this.bet;
+    }
+
+    public void doubleBet() {
+        this.bet *= 2;
     }
 }

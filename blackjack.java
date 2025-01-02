@@ -10,6 +10,7 @@ import java.util.Scanner;
 
 public class blackjack {
 
+   public static int bankBalance = 0;
  
    public static void main(String[] args) {
       Scanner bob = new Scanner(System.in);
@@ -28,32 +29,37 @@ public class blackjack {
       System.out.println("\nWelcome to Blackjack!");
 
       boolean valid = true;
+      boolean again = false;
       do {
          System.out.println("\n1 - Play\n2 - Rules");
          System.out.print("Enter a number to get started: ");
          int choice = bob.nextInt();
          switch(choice) {
-            case 1: valid = true;
-                  int result = playBlackjack();
+            case 1: 
+               valid = true;
+               System.out.print("How much money would you like to put in your account?: $");
+               bankBalance = bob.nextInt();
 
-                  switch(result) {
-                     case 1: 
-                     System.out.println("Normal Win (2:1)");
-                     break;
-                     case 2: 
-                     System.out.println("Blackjack Win (3:2)");
-                     break;
-                     case 3: 
-                     System.out.println("Lost");
-                     break;
-                     case 4: 
-                     System.out.println("Tie (Push)");
-                     break;
-                     default: 
-                     System.out.println("Error");
-                     
+               do {
+                  System.out.println("Bank Balance: " + bankBalance);
+                  System.out.print("How much money would you like to bet?: $");
+                  int bet = bob.nextInt();
+                  bankBalance -= bet;
+                  playBlackjack(bet);
+                  if(bankBalance < 1) {
+                     System.out.println("You have no money left!");
+                  } else {
+                     System.out.println("Would you like to play again? (1 for yes): ");
+                     int yes = bob.nextInt();
+                     if(yes == 1) {
+                        again = true;
+                     } else {
+                        again = false;
+                     }
                   }
-                  break;
+               } while(again);
+               
+               break;
             case 2: valid = false;
                   rules();
                   break;
@@ -88,7 +94,7 @@ public class blackjack {
                   Delay.prompt();
    }
    
-   public static int playBlackjack() {
+   public static void playBlackjack(int betAmt) {
 
       /*RETURN VALS
       *1 - player wins (2:1) (noraml win)
@@ -105,8 +111,8 @@ public class blackjack {
       
       //INITIAL 2-CARD DEAL
 
-      Hand dealerHand = new Hand();
-      Hand playerHand = new Hand();
+      Hand dealerHand = new Hand(0);
+      Hand playerHand = new Hand(betAmt);
       ArrayList<Hand> hands = new ArrayList<Hand>();
       hands.add(playerHand);
 
@@ -154,48 +160,20 @@ public class blackjack {
             playHand(hands, i, deck);
             if(currentHand.hasBusted()) {
                currentHand.setOutcome(Hand.Outcome.LOST);
+               doDealerHand = false;
             }
          }
       }
 
       
       //DEALER TURN
+
       if(doDealerHand) {
          System.out.println("The dealer has a(n) " + d1 + " and a(n) " + d2);
          System.out.println("\nThe dealer's hand total is " + dealerHand.val());
          System.out.print("\n");
 
-         Delay.prompt();
-         
-         while(doDealerHand){
-            int softDealVal = dealerHand.val() - (10 * dealerHand.numAces());
-
-            if(softDealVal < 17) { //DEALER HIT
-               System.out.println("The dealer hits!\n");
-
-               dealerHand.dealToHand(deck.dealOne());
-
-               dealerHand.displayHand(2);
-
-               doDealerHand = true;
-
-               Delay.prompt();
-
-            } else if(dealerHand.val() > 21) { //DEALER BUST
-               System.out.println("The dealer busted! You win!"); //WIN
-               doDealerHand = false; 
-               for(int i = 0; i < hands.size(); i++) {
-                  hands.get(i).setOutcome(Hand.Outcome.NORMAL_WIN);
-               }
-               
-               
-            } else { // DEALER STAND
-               System.out.println("The dealer stands!\n");
-               doDealerHand = false;
-            }
-   
-         }
-
+         dealerTurn(hands, dealerHand, deck);
       }
 
       for(int i = 0; i < hands.size(); i++) {
@@ -213,9 +191,6 @@ public class blackjack {
             }
          }
       }
-
-      return 0;
-   
    }
 
    public static void playHand(ArrayList<Hand> hands, int i, Deck deck) {
@@ -228,6 +203,7 @@ public class blackjack {
       while(cont){
 
          System.out.println("Hand " + (i + 1));
+         System.out.println("Current Bet: " + currentHand.bet());
          currentHand.displayHand(1);
          int answer;
          if(currentHand.canBeSplit()) {
@@ -254,7 +230,7 @@ public class blackjack {
                break;
             case 3: //Split
                cont = true;;
-               Hand newHand = new Hand();
+               Hand newHand = new Hand(currentHand.bet());
                hands.add(newHand);
                newHand.dealToHand(currentHand.split());
                newHand.dealToHand(deck.dealOne());
@@ -284,4 +260,39 @@ public class blackjack {
       return;
    }
 
+   public static void dealerTurn(ArrayList<Hand> hands, Hand dealerHand, Deck deck) {
+
+      Delay.prompt();
+
+      boolean dealCont = true;
+
+      while(dealCont){
+         int softDealVal = dealerHand.val() - (10 * dealerHand.numAces());
+
+         if(softDealVal < 17) { //DEALER HIT
+            System.out.println("The dealer hits!\n");
+
+            dealerHand.dealToHand(deck.dealOne());
+
+            dealerHand.displayHand(2);
+
+            dealCont = true;
+
+            Delay.prompt();
+
+         } else if(dealerHand.val() > 21) { //DEALER BUST
+            System.out.println("The dealer busted! You win!"); //WIN
+            dealCont = false; 
+            for(int i = 0; i < hands.size(); i++) {
+               hands.get(i).setOutcome(Hand.Outcome.NORMAL_WIN);
+            }
+               
+               
+         } else { // DEALER STAND
+            System.out.println("The dealer stands!\n");
+            dealCont = false;
+         }
+   
+      }
+   }
 }
