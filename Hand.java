@@ -73,11 +73,15 @@ public class Hand {
         }
 
         for(int i = 0; i < this.cards.size(); i++) {
+            display.cardFace(this.cards.get(i));
+        }
+
+        /* for(int i = 0; i < this.cards.size(); i++) {
             if(i == 0)
                System.out.print(prefix1 + " a(n) " + this.cards.get(i));
             else
                System.out.print(" and a(n) " + this.cards.get(i));
-        }
+        } */
 
         System.out.println("\n" + prefix2 + " hand total is " + this.handVal);
     }
@@ -112,8 +116,6 @@ public class Hand {
     public void setOutcome(Outcome outcome) {
         if(this.outcome == Outcome.NOT_RESOLVED) {
             this.outcome = outcome;
-        } else if(this.outcome == Outcome.BLACKJACK_WIN && outcome == Outcome.NORMAL_WIN){ 
-            //OKAY
         } else {
             System.out.println("\nBRUH YOU TRIED TO SET THE OUTCOME FOR THE SAME HAND TWICE\n");
         }
