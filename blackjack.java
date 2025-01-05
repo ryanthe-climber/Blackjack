@@ -1,7 +1,7 @@
 /**
 *blackjack.java
 *Ryan Agricola
-*12/20/2024
+*01/04/2024
 *plays black jack
 */
 
@@ -39,11 +39,20 @@ public class blackjack {
                valid = true;
                System.out.print("How much money would you like to put in your account?: $");
                bankBalance = bob.nextInt();
+               while(bankBalance <= 0) {
+                  System.out.print("Invalid amount. Please enter an amount greater than zero: $");
+                  bankBalance = bob.nextInt();
+               }
 
                do {
-                  System.out.println("Bank Balance: " + bankBalance);
+                  System.out.println("\nBank Balance: " + bankBalance);
                   System.out.print("How much money would you like to bet?: $");
                   int bet = bob.nextInt();
+                  while(bet <= 0 || bet > bankBalance) {
+                     System.out.println("\nBank Balance: " + bankBalance);
+                     System.out.print("Invalid bet. Please make sure your bet is positive and not greater than your current bank balance: $");
+                     bet = bob.nextInt();
+                  }
                   
                   playBlackjack(bet);
                   if(bankBalance < 1) {
@@ -51,7 +60,7 @@ public class blackjack {
                      again = false;
                      valid = true;
                   } else {
-                     System.out.println("Would you like to play again? (1 for yes): ");
+                     System.out.print("\nWould you like to play again? (1 for yes): ");
                      int yes = bob.nextInt();
                      if(yes == 1) {
                         again = true;
@@ -246,10 +255,13 @@ public class blackjack {
             System.out.print("1 - HIT\n" + //
                           "2 - STAND\n" + //
                           "3 - SPLIT\n"); //
+            System.out.print("Choose and option: ");
+                          
             answer = joe.nextInt();
          } else {
             System.out.print("1 - HIT\n" + //
                              "2 - STAND\n");
+            System.out.print("Choose and option: "); //SPLITTING DOES NOT WORK. FIX THIS
             answer = joe.nextInt();
          }
          
