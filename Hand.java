@@ -162,8 +162,11 @@ public class Hand {
     public void setOutcome(Outcome outcome) {
         if(this.outcome == Outcome.NOT_RESOLVED) {
             this.outcome = outcome;
+        } else if(this.outcome == Hand.Outcome.NORMAL_WIN) {
+            //OKAY TO SUPPORT CHEAT CODE
         } else {
             System.out.println("\nBRUH YOU TRIED TO SET THE OUTCOME FOR THE SAME HAND TWICE\n");
+            System.out.println("Was: " + this.outcome + "\t" + "Setting to: " + outcome);
         }
     }
 

@@ -328,6 +328,13 @@ public class blackjack {
                   System.out.println("Invalid choice. Please try again: \n");
                }
                break;
+            
+            case '-': //CHEAT CODE - ENTER '-' TO WIN THE HAND INSTANTLY
+               currentHand.setOutcome(Hand.Outcome.NORMAL_WIN);
+               System.out.println("\n\nI have a good feeling about this hand for you...\n\n");
+               cont = false;
+               break;
+               
 
             default: 
                cont = true;
