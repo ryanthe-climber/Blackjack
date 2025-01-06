@@ -1,5 +1,15 @@
+/**
+*display.java
+*Ryan Agricola
+*01/05/2024
+*prints out ascii art to display cards
+*/
 public class display {
 
+    /**Displays one card with ascii art
+    *@param card - the Card that will be displayed
+    *@return nothing
+    */
     public static void cardFace (Card card) {
         
         int cardVal = card.value();
@@ -74,6 +84,10 @@ public class display {
 
     }
 
+    /**prints out a standard back of a card
+    *@param - no parameters
+    *@return nothing
+    */
     public static void cardBack () {
         System.out.println(//
                         "┌─────────┐\n" + //

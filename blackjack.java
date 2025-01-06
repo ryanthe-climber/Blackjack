@@ -1,7 +1,7 @@
 /**
 *blackjack.java
 *Ryan Agricola
-*01/04/2024
+*01/05/2024
 *plays black jack
 */
 
@@ -10,7 +10,7 @@ import java.util.Scanner;
 
 public class blackjack {
 
-   public static int bankBalance = 0;
+   public static int bankBalance = 1000; //Starting balance
  
    public static void main(String[] args) {
       Scanner bob = new Scanner(System.in);
@@ -28,6 +28,7 @@ public class blackjack {
 
       System.out.println("\nWelcome to Blackjack!");
 
+      int cheatCount = 0;
       boolean valid = true;
       boolean again = false;
       do {
@@ -37,19 +38,25 @@ public class blackjack {
          switch(choice) {
             case 1: 
                valid = true;
-               System.out.print("How much money would you like to put in your account?: $");
-               bankBalance = bob.nextInt();
-               while(bankBalance <= 0) {
-                  System.out.print("Invalid amount. Please enter an amount greater than zero: $");
-                  bankBalance = bob.nextInt();
-               }
 
                do {
-                  System.out.println("\nBank Balance: " + bankBalance);
+                  
+                  System.out.println("\nBank Balance: $" + bankBalance);
                   System.out.print("How much money would you like to bet?: $");
                   int bet = bob.nextInt();
+                  if(bet == 8675309) { //CHEATCODE - ENTER 8675309 INTO THE BET TO GAIN $100,000
+                     if (cheatCount >= 2) {
+                        System.out.print("\nYou greedy little brat! $200,000 is plenty!\n");
+                        bankBalance = 100;
+                     } else {
+                        bankBalance += 100000;
+                        System.out.print("\n\nCongratulations! You found a cheatcode! Here is $100,000.\n\n");
+                        bet = -1;
+                        cheatCount += 1;
+                     }
+                  }
                   while(bet <= 0 || bet > bankBalance) {
-                     System.out.println("\nBank Balance: " + bankBalance);
+                     System.out.println("\nBank Balance: $" + bankBalance);
                      System.out.print("Invalid bet. Please make sure your bet is positive and not greater than your current bank balance: $");
                      bet = bob.nextInt();
                   }
@@ -82,6 +89,10 @@ public class blackjack {
       } while(valid == false);
    }
 
+   /**Prints out the rules of blackjack
+    *@param - no parameters
+    *@return - returns nothing
+    */
    public static void rules() {
       System.out.println("\nBlackjack Rules\n" + //
                   "In Blackjack, everyone plays against the dealer. Players receive all cards face up and the dealer’s first card is face up and the second is face down. The object of the game is to get closer to 21 than the dealer without going over 21. If a hand goes over 21, it is called a “bust” or “break” and the wager is lost. In 21, Jacks, Queens, Kings and 10s count as 10. An Ace may be played as a one or an 11. All other cards are played at face value.\n" + //
@@ -105,6 +116,10 @@ public class blackjack {
                   Delay.prompt();
    }
    
+   /**Simulates a game of blackjack with the player and the dealer
+    *@param betAmt - the inputted bet for the hand
+    *@return - returns nothing
+    */
    public static void playBlackjack(int betAmt) {
 
       /*RETURN VALS
@@ -210,27 +225,33 @@ public class blackjack {
          }
       }
 
-
+      //DO ACTION ACCORDING TO WHAT THE OUTCOME IS SET TO FOR THE HAND (WIN MONEY, LOSE MONEY)
+      
       for(int i = 0; i < hands.size(); i++) {
-         Hand.Outcome outcome = hands.get(i).outcome();
+         Hand currentHand = hands.get(i);
+         Hand.Outcome outcome = currentHand.outcome();
+         int bet = currentHand.bet();
          switch(outcome) {
             case NORMAL_WIN:
-               System.out.println("You won $" + betAmt + "!");
-               bankBalance += betAmt;
+               System.out.println("You won $" + bet + "!\n");
+               bankBalance += bet;
                break;
             case BLACKJACK_WIN:
-               System.out.println("You have Blackjack!\nYou won $" + (betAmt * 1.5) + "!"); 
-               bankBalance += (betAmt * 1.5);
+               System.out.println("\nCurrent Bet: $" + bet + "\n");
+               currentHand.displayHand(1);
+               System.out.println("You have Blackjack!\nYou won $" + (bet * 1.5) + "!\n"); 
+               bankBalance += (bet * 1.5);
                break;
             case LOST:
-               System.out.println("You lost $" + betAmt + "!");
-               bankBalance -= betAmt;
+               System.out.println("You lost $" + bet + "!\n");
+               bankBalance -= bet;
                break;
             case PUSH:
-               System.out.println("You tied with the dealer!");
+               System.out.println("You tied with the dealer!\n");
+               System.out.println("Bank Balance: $" + bankBalance);
                break;
             case NOT_RESOLVED:
-               System.out.println("ERROR");
+               System.out.println("\nERROR\n");
                break;
 
          }
@@ -238,6 +259,12 @@ public class blackjack {
 
    }
 
+   /**plays all of the players hands
+    *@param hands - the list of hands that the player currently has
+    *@param i - the current iteratioon of the for loop
+    *@param deck - the Deck object that the Cards are dealt out of
+    *@return - returns nothing
+    */
    public static void playHand(ArrayList<Hand> hands, int i, Deck deck) {
       Scanner joe = new Scanner(System.in);
 
@@ -247,60 +274,82 @@ public class blackjack {
 
       while(cont){
 
-         System.out.println("HAND " + (i + 1) + ": " + currentHand.val());
-         System.out.println("Current Bet: " + currentHand.bet());
+         System.out.println("\nHAND " + (i + 1) + ": " + currentHand.val());
+         System.out.println("Current Bet: $" + currentHand.bet() + "\n");
          currentHand.displayHand(1);
-         int answer;
-         if(currentHand.canBeSplit()) {
-            System.out.print("1 - HIT\n" + //
-                          "2 - STAND\n" + //
-                          "3 - SPLIT\n"); //
-            System.out.print("Choose and option: ");
-                          
-            answer = joe.nextInt();
-         } else {
-            System.out.print("1 - HIT\n" + //
-                             "2 - STAND\n");
-            System.out.print("Choose and option: "); //SPLITTING DOES NOT WORK. FIX THIS
-            answer = joe.nextInt();
-         }
+         char answer;
          
+         System.out.print("(h)it, (s)tand");
+         if(currentHand.canBeSplit()) {
+            System.out.print(", s(p)lit");
+         }
+         if(currentHand.canBeDoubled() && (currentHand.bet() * 2) <= bankBalance) {
+            System.out.print(", (d)ouble");
+         }
+         System.out.print("?\n");
+
+         System.out.print("Choose and option: ");
+         
+         answer = joe.next().charAt(0);
+         boolean doubled = false;
          
          switch(answer) {
-            case 1: //Hit
+            case 'h': //Hit
                cont = true;
                currentHand.dealToHand(deck.dealOne());
                
                break;
-            case 2: // Stand
+            case 's': // Stand
                cont = false;
-               System.out.println("\n");
+               System.out.print("\n");
                break;
-            case 3: //Split
-               cont = true;;
-               Hand newHand = new Hand(currentHand.bet());
-               hands.add(newHand);
-               newHand.dealToHand(currentHand.split());
-               newHand.dealToHand(deck.dealOne());
-               currentHand.dealToHand(deck.dealOne());
-               break;
+            case 'p': //Split
+               if(currentHand.canBeSplit()) {
+                  cont = true;;
+                  Hand newHand = new Hand(currentHand.bet());
+                  hands.add(newHand);
+                  newHand.dealToHand(currentHand.split());
+                  newHand.dealToHand(deck.dealOne());
+                  currentHand.dealToHand(deck.dealOne());
+               } else {
+                  cont = true;
+                  System.out.println("Invalid choice. Please try again: \n");
+               }
                
+               break;
+            case 'd': //Double
+               if(currentHand.canBeDoubled() && (currentHand.bet() * 2) <= bankBalance) {
+                  doubled = true;
+                  currentHand.doubleBet();
+                  currentHand.dealToHand(deck.dealOne());
+                  cont = false;
+               } else {
+                  cont = true;
+                  System.out.println("Invalid choice. Please try again: \n");
+               }
+               break;
+
             default: 
                cont = true;
                System.out.println("Invalid choice. Please try again: \n");
          }
 
          if(currentHand.val() == 21) {
-            System.out.println("Hand " + (i + 1));
+            System.out.println("\nHAND " + (i + 1));
             currentHand.displayHand(1);
             System.out.println("You have 21! Dealer's turn!\n");
             cont = false;
          } else if(currentHand.hasBusted()) {
-            System.out.println("Hand " + (i + 1));
+            System.out.println("\nHAND " + (i + 1));
             currentHand.displayHand(1);
             System.out.println("Bust! You lose!\n"); //LOSE
             cont = false;
             break;
+         } else if(doubled) {
+            System.out.println("\nHAND " + (i + 1));
+            System.out.println("Current Bet: $" + currentHand.bet() + "\n");
+            currentHand.displayHand(1);
+            Delay.prompt();
          }
 
       }
@@ -308,6 +357,12 @@ public class blackjack {
       return;
    }
 
+   /**plays the dealers hand
+    *@param hands - the list of hands that the player currently has
+    *@param dealerHand - the Hand object that store the dealers cardsd
+    *@param deck - the Deck object that the Cards are dealt out of
+    *@return - returns nothing
+    */
    public static void dealerTurn(ArrayList<Hand> hands, Hand dealerHand, Deck deck) {
 
       Delay.prompt();
@@ -343,4 +398,5 @@ public class blackjack {
    
       }
    }
+
 }
